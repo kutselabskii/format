@@ -26,7 +26,7 @@ def nameCheck(path, filename):
                 string = re.sub(place, '', string)
                 if (string not in namespaceList):
                     if (re.match(namespaceReg, string) == None):
-                        print ('Namespace ' + string + ' on ' + place + 'in ' + path + "\\" + filename)
+                        print ('@->Namespace ' + string + ' on ' + place + 'in ' + path + "\\" + filename)
                     namespaceList.append(string)
 
         #Functions check
@@ -38,7 +38,7 @@ def nameCheck(path, filename):
                 string = re.sub(' .*$', '', string)
                 if (string not in funcList):
                     if (re.match(functionReg, string) == None):
-                        print ('Function ' + string + ' on ' + place + 'in ' + path + "\\" + filename)
+                        print ('@->Function ' + string + ' on ' + place + 'in ' + path + "\\" + filename)
                     funcList.append(string)
         #Variables check
         if (re.search('VarDecl', i)):
@@ -49,7 +49,7 @@ def nameCheck(path, filename):
                 string = re.sub(' .*$', '', string)
                 if (string not in varList):
                     if (re.match(variableReg, string) == None):
-                        print ('Variable ' + string + ' on ' + place + 'in ' + path + "\\" + filename)
+                        print ('@->Variable ' + string + ' on ' + place + 'in ' + path + "\\" + filename)
                     varList.append(string)    
 
                 
@@ -69,7 +69,9 @@ functionReg  = '^[a-z][a-z0-9_]*$' #under_score
 global placementReg
 placementReg = '\w{3,4}(?::\d+){1,2} ' #aaaa:11:11 || aaaa:11
 
-config = open('format.config', 'r')
+currentDir = re.sub('format\.py', '', os.path.abspath(__file__))
+
+config = open(currentDir + '\\format.config', 'r')
 config_data = config.readlines()
 config.close()
 for i in config_data:
@@ -80,7 +82,8 @@ for i in config_data:
     if (re.search('Function:', i)):
         functionReg = re.findall('\^.*\$', i)[0]
 
-clangFormat(os.getcwd())
+clangFormat(currentDir)
+wait = input('Watch')
 
 ##nameCheck('D:\\Test\\test', 'Source.cpp')
 
