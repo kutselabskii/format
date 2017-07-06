@@ -15,6 +15,12 @@ def nameCheck(path, filename):
     file = open(path + "\\dump.d", "r")
     data = file.readlines()
     file.close()
+
+    #Filename check
+    temp = re.sub('\..*$', '', filename)
+    if (re.match(filenameReg, temp) == None):
+        print ('@->Filename ' + filename + ' at ' + path)
+    
     for i in data:
         i = i.rstrip('\n')
 
@@ -46,10 +52,18 @@ def nameCheck(path, filename):
                 string = re.sub('^.*> ', '', i)
                 place = re.findall(placementReg, string)[0]
                 string = re.sub(place, '', string)
+                
+                constFlag = True
+                if (re.search('const', string) == None):
+                    constFlag = False
                 string = re.sub(' .*$', '', string)
                 if (string not in varList):
-                    if (re.match(variableReg, string) == None):
-                        print ('@->Variable ' + string + ' on ' + place + 'in ' + path + "\\" + filename)
+                    if (constFlag):
+                        if (re.match(constVarReg, string) == None):
+                            print ('@->Constant ' + string + ' on ' + place + 'in ' + path + "\\" + filename)
+                    else:
+                        if (re.match(variableReg, string) == None):
+                            print ('@->Variable ' + string + ' on ' + place + 'in ' + path + "\\" + filename)
                     varList.append(string)    
 
                 
@@ -60,10 +74,12 @@ funcList = ['main']
 varList = []
 
 #Default regexes
-global namespaceReg, variableReg, functionReg
-namespaceReg = '^[a-z][a-z0-9_]*$' #under_score
-variableReg  = '^[a-z][a-z0-9_]*$' #under_score
-functionReg  = '^[a-z][a-z0-9_]*$' #under_score
+global namespaceReg, variableReg, functionReg, filenameReg, constVarReg
+namespaceReg     = '^[a-z][a-z0-9_]*$' #under_score
+variableReg      = '^[a-z][a-z0-9_]*$' #under_score
+functionReg      = '^[a-z][a-z0-9_]*$' #under_score
+filenameReg      = '^[a-z][a-z0-9_]*$' #under_score
+constVarReg      = '^[A-Z][A-Z0-9_]*$' #ALL_CAPITALS
 
 #AST regexes
 global placementReg
@@ -81,6 +97,11 @@ for i in config_data:
         variableReg = re.findall('\^.*\$', i)[0]
     if (re.search('Function:', i)):
         functionReg = re.findall('\^.*\$', i)[0]
+    if (re.search('Filename:', i)):
+        filenameReg = re.findall('\^.*\$', i)[0]
+    if (re.search('Constant:', i)):
+        constVarReg = re.findall('\^.*\$', i)[0]
+    
 
 clangFormat(currentDir)
 wait = input('Watch')
