@@ -1,4 +1,5 @@
 import os, re
+from tkinter import *
 
 def clangFormat(path):
     fileList = os.listdir(path)
@@ -19,7 +20,7 @@ def nameCheck(path, filename):
     #Filename check
     temp = re.sub('\..*$', '', filename)
     if (re.match(filenameReg, temp) == None):
-        print ('@->Filename ' + filename + ' at ' + path)
+        text.insert (END, 'Filename ' + filename + ' at ' + path + " \n")
     
     for i in data:
         i = i.rstrip('\n')
@@ -32,7 +33,7 @@ def nameCheck(path, filename):
                 string = re.sub(place, '', string)
                 if (string not in namespaceList):
                     if (re.match(namespaceReg, string) == None):
-                        print ('@->Namespace ' + string + ' on ' + place + 'in ' + path + "\\" + filename)
+                        text.insert(END, '-Namespace ' + string + ' on ' + place + 'in ' + path + "\\" + filename + " \n")
                     namespaceList.append(string)
 
         #Functions check
@@ -44,7 +45,7 @@ def nameCheck(path, filename):
                 string = re.sub(' .*$', '', string)
                 if (string not in funcList):
                     if (re.match(functionReg, string) == None):
-                        print ('@->Function ' + string + ' on ' + place + 'in ' + path + "\\" + filename)
+                        text.insert (END, '---Function ' + string + ' on ' + place + 'in ' + path + "\\" + filename + " \n")
                     funcList.append(string)
         #Variables check
         if (re.search('VarDecl', i)):
@@ -60,11 +61,14 @@ def nameCheck(path, filename):
                 if (string not in varList):
                     if (constFlag):
                         if (re.match(constVarReg, string) == None):
-                            print ('@->Constant ' + string + ' on ' + place + 'in ' + path + "\\" + filename)
+                            text.insert (END, '----Constant ' + string + ' on ' + place + 'in ' + path + "\\" + filename + " \n")
                     else:
                         if (re.match(variableReg, string) == None):
-                            print ('@->Variable ' + string + ' on ' + place + 'in ' + path + "\\" + filename)
+                            text.insert (END, '----Variable ' + string + ' on ' + place + 'in ' + path + "\\" + filename + " \n")
                     varList.append(string)    
+
+def buttonPress():
+    clangFormat(currentDir)
 
                 
 #Ignored names
@@ -85,7 +89,21 @@ constVarReg      = '^[A-Z][A-Z0-9_]*$' #ALL_CAPITALS
 global placementReg
 placementReg = '\w{3,4}(?::\d+){1,2} ' #aaaa:11:11 || aaaa:11
 
+#Window
+global root, text, button
+root = Tk()
+root.title("Warning list")
+root.geometry("640x480")
+button = Button(text="Begin", command=buttonPress)
+button.pack(fill=BOTH)
+text = Text(root)
+text.pack()
+
+#Miscellaneous
+global currentDir
 currentDir = re.sub('format\.py', '', os.path.abspath(__file__))
+
+
 
 config = open(currentDir + '\\format.config', 'r')
 config_data = config.readlines()
@@ -101,10 +119,12 @@ for i in config_data:
         filenameReg = re.findall('\^.*\$', i)[0]
     if (re.search('Constant:', i)):
         constVarReg = re.findall('\^.*\$', i)[0]
-    
 
-clangFormat(currentDir)
-wait = input('Watch')
+
+root.mainloop()
+
+#clangFormat(currentDir)
+#wait = input('Watch')
 
 ##nameCheck('D:\\Test\\test', 'Source.cpp')
 
