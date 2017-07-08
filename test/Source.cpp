@@ -22,6 +22,14 @@ double anotherfunction()
 
 SomeClass::Constructor() : aaaaaaaa(aaaaaaaa), aaaaaaaa(aaaaaaaa), aaaaaaaa(aaaaaaaaaaaaaaaaaaaaaaaaa) { return 0; }
 
+class myclass
+{
+  public:
+    int x;
+
+    myclass();
+}
+
 int main()
 {
     int n;
